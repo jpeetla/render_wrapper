@@ -24,12 +24,15 @@ app.post("/api/process-domains", async (req, res) => {
 
   const results = await scrapeDomains(domains);
   console.log("Passing final results to backend for conversion to CSV...");
-  axios.post("http://localhost:3000/api/receiveCompanyExecutiveWSData", {
-    results,
-    companyNameDict,
-    investorReferenceDict,
-    companyReferenceDict,
-  });
+  axios.post(
+    "https://paraform-smartleads-6cvjgtr08-paraform-sales.vercel.app/api/receiveCompanyExecutiveWSData",
+    {
+      results,
+      companyNameDict,
+      investorReferenceDict,
+      companyReferenceDict,
+    }
+  );
 
   res.status(200).json({
     message: "Input received and running domains through scraper...",
