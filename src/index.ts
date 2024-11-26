@@ -1,22 +1,50 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import { scrapeDomains } from "./services/wrapper";
+import axios from "axios";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
 app.use(express.json());
 
-// Routes
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, Render!");
+app.post("/api/process-domains", async (req, res) => {
+  const {
+    domains,
+    companyNameDict,
+    investorReferenceDict,
+    companyReferenceDict,
+  } = req.body;
+
+  if (
+    !Array.isArray(domains) ||
+    typeof companyNameDict !== "object" ||
+    typeof investorReferenceDict !== "object" ||
+    typeof companyReferenceDict !== "object"
+  ) {
+    return;
+  }
+
+  const results = await scrapeDomains(domains);
+  console.log("Passing final results to backend for conversion to CSV...");
+  axios.post("http://localhost:3000/api/receiveCompanyExecutiveWSData", {
+    results,
+    companyNameDict,
+    investorReferenceDict,
+    companyReferenceDict,
+  });
+
+  res.status(200).json({
+    message: "Input received and running domains through scraper...",
+    domainsCount: domains.length,
+    results: results,
+  });
 });
 
-app.post("/api/process", (req: Request, res: Response) => {
-  const { message } = req.body;
-  res.json({ success: true, message: `Processed: ${message}` });
+app.use((req, res) => {
+  res.status(404).send(`Cannot ${req.method} ${req.url}`);
 });
 
-// Start the server
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+export default app;
