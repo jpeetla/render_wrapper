@@ -25,7 +25,7 @@ app.post("/api/process-domains", async (req, res) => {
   const results = await scrapeDomains(domains);
   console.log("Passing final results to backend for conversion to CSV...");
   axios.post(
-    "https://paraform-smartleads-6cvjgtr08-paraform-sales.vercel.app/api/receiveCompanyExecutiveWSData",
+    "https://paraform-smartleads-xi.vercel.app/api/receiveCompanyExecutiveWSData",
     {
       results,
       companyNameDict,
