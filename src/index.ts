@@ -24,7 +24,7 @@ app.post("/api/process-domains", async (req, res) => {
 
   const results = await scrapeDomains(domains);
   console.log("Passing final results to backend for conversion to CSV...");
-  axios.post(
+  await axios.post(
     "https://paraform-smartleads-xi.vercel.app/api/receiveCompanyExecutiveWSData",
     {
       results,
@@ -34,11 +34,9 @@ app.post("/api/process-domains", async (req, res) => {
     }
   );
 
-  res.status(200).json({
-    message: "Input received and running domains through scraper...",
-    domainsCount: domains.length,
-    results: results,
-  });
+  console.log("Data sent to Vercel for Prisma upload...");
+
+  return;
 });
 
 app.use((req, res) => {
